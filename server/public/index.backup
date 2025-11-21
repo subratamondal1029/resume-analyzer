@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Streaming with http</title>
+  </head>
+  <body>
+    <div id="progress-status"></div>
+
+    <script>
+      const statusDiv = document.getElementById("progress-status");
+      async function fetchData() {
+        const ev = new EventSource("/analyze-status");
+
+        ev.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          statusDiv.innerText = `Progress: ${data.progress}% - Status: ${data.status}`;
+          if (data.progress >= 100) {
+            ev.close();
+            statusDiv.innerText = "Analysis Complete!";
+          }
+        };
+
+        ev.onerror = (err) => {
+          console.error("EventSource failed:", err);
+          ev.close();
+        };
+      }
+
+      fetchData();
+
+      /*
+        // Sample route for SSE (server side)
+        app.get("/analyze-status", (req, res) => {
+          res.setHeader("Content-Type", "text/event-stream");
+          res.setHeader("Cache-Control", "no-cache");
+          res.setHeader("Connection", "keep-alive");
+
+          // Send initial data or a welcome message
+          // res.write('data: Welcome to the SSE stream!\n\n');
+          const statuses = [
+            {
+              progress: 0,
+              status: "Starting analysis...",
+            },
+            {
+              progress: 50,
+              status: "Reading Documents...",
+            },
+            {
+              progress: 80,
+              status: "Matching Rules...",
+            },
+            {
+              progress: 100,
+              status: "Analysis Complete!",
+            },
+          ];
+
+          let index = 0;
+          const interval = setInterval(() => {
+            if (index < statuses.length) {
+              res.write(`data: ${JSON.stringify(statuses[index])}\n\n`);
+              index++;
+            } else {
+              clearInterval(interval);
+              res.end();
+            }
+          }, 1000);
+
+          req.on("close", () => {
+            clearInterval(interval);
+            console.log("Client disconnected from SSE");
+          });
+        });
+      */
+    </script>
+  </body>
+</html>

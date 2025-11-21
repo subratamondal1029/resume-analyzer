@@ -1,0 +1,49 @@
+# Node dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Runtime data / temp
+.tmp/
+.temp/
+.cache/
+coverage/
+
+# Build output (add if you create these)
+dist/
+build/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# OS / Editor clutter
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Uploads or generated analysis artifacts (adjust if you need to keep them)
+uploads/
+
+# Docker local data volumes (define if you create them)
+docker-data/
+
+# Reports / exports (uncomment if generated)
+# reports/
+# exports/
+
+# Ignore lockfiles? (Keep pnpm-lock.yaml for reproducibility)
+# package-lock.json
+# yarn.lock
+
+# Misc
+*.log.*
