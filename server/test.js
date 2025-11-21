@@ -71,12 +71,6 @@ export async function pagesToOCR(
   return responses;
 }
 
-function cleanForLLM(raw) {
-  let s = raw.trim();
-  s = s.replace(/\s+/g, " ");
-  return s;
-}
-
 async function checkRule(text, rules) {
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
@@ -129,7 +123,7 @@ const getText = async (filePath) => {
       console.log("OCR Text length:", text.length);
     }
 
-    const cleanedText = cleanForLLM(text);
+    const cleanedText = text.trim().replace(/\s+/g, " ");
 
     const llmResponse = await checkRule(cleanedText, [
       "The document must mention at least one date.",
