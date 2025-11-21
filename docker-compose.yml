@@ -16,6 +16,8 @@ services:
       - "3000:3000"
     env_file:
       - ./server/.env
+    environment:
+      - TESSERACT_API=http://tesseract:8884/tesseract
     depends_on:
       - tesseract
     volumes:
