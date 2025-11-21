@@ -28,13 +28,25 @@ const pdfAnalyze = asyncHandler(async (req, res) => {
   );
   setTimeout(
     () =>
-      updateProgress(analysisId, "Complete!", 100, {
-        status: "pass",
-        rule: "Document must mention a date.",
-        evidence: "Found in page 1: 'Published 2024'",
-        reasoning: "Document includes a publication year.",
-        confidence: 92,
-      }),
+      updateProgress(analysisId, "Complete!", 100, [
+        {
+          status: "pass",
+          rule: "Document must mention a date",
+          evidence: "Found on page 1: 'Published 2024'",
+          reasoning: "Document includes a publication year.",
+          confidence: 92,
+        },
+        {
+          status: "fail",
+          rule: "Document must include an author name",
+          evidence: "No author byline detected in title page or headers",
+          reasoning:
+            "Could not detect an author in the document metadata or visible text.",
+          confidence: 65,
+          suggestion:
+            "Add an author byline on the title page or include author metadata.",
+        },
+      ]),
     4000
   );
 
