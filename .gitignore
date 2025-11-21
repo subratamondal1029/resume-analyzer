@@ -32,7 +32,7 @@ Thumbs.db
 *.swp
 
 # Uploads or generated analysis artifacts (adjust if you need to keep them)
-uploads/
+uploads/*
 !uploads/.gitkeep
 
 # Docker local data volumes (define if you create them)
