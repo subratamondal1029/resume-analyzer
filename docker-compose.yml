@@ -1,0 +1,30 @@
+services:
+  tesseract:
+    image: hertzg/tesseract-server:latest
+    container_name: tesseract-server
+    ports:
+      - "8884"
+    expose:
+      - "8884"
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: pdf_backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - tesseract
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
+    command: pnpm run dev
