@@ -185,60 +185,60 @@
     <div class="container">
       <h1>Upload PDF for Analysis</h1>
       <form id="upload-form" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="fileInput">PDF File</label>
-        <input
-          type="file"
-          name="file"
-          id="fileInput"
-          accept="application/pdf"
-          required
-        />
-      </div>
-      <div class="form-group">
-        <label for="rule1">Rule 1</label>
-        <input
-          type="text"
-          name="rule1"
-          id="rule1"
-          placeholder="Enter first rule to check"
-        />
-      </div>
-      <div class="form-group">
-        <label for="rule2">Rule 2</label>
-        <input
-          type="text"
-          name="rule2"
-          id="rule2"
-          placeholder="Enter second rule to check"
-        />
-      </div>
-      <div class="form-group">
-        <label for="rule3">Rule 3</label>
-        <input
-          type="text"
-          name="rule3"
-          id="rule3"
-          placeholder="Enter third rule to check"
-        />
-      </div>
-      <button type="submit" id="submitBtn">Start Analysis</button>
-    </form>
-    <p id="statusText">Idle.</p>
-    <div
-      class="progress-wrapper"
-      aria-hidden="false"
-      aria-label="Analysis progress"
-    >
+        <div class="form-group">
+          <label for="fileInput">PDF File</label>
+          <input
+            type="file"
+            name="file"
+            id="fileInput"
+            accept="application/pdf"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="rule1">Rule 1</label>
+          <input
+            type="text"
+            name="rule1"
+            id="rule1"
+            placeholder="Enter first rule to check"
+          />
+        </div>
+        <div class="form-group">
+          <label for="rule2">Rule 2</label>
+          <input
+            type="text"
+            name="rule2"
+            id="rule2"
+            placeholder="Enter second rule to check"
+          />
+        </div>
+        <div class="form-group">
+          <label for="rule3">Rule 3</label>
+          <input
+            type="text"
+            name="rule3"
+            id="rule3"
+            placeholder="Enter third rule to check"
+          />
+        </div>
+        <button type="submit" id="submitBtn">Start Analysis</button>
+      </form>
+      <p id="statusText">Idle.</p>
       <div
-        class="progress-bar"
-        id="progressBar"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow="0"
+        class="progress-wrapper"
+        aria-hidden="false"
+        aria-label="Analysis progress"
+      >
+        <div
+          class="progress-bar"
+          id="progressBar"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        ></div>
       </div>
-    </div>
     </div>
     <div id="result"></div>
 
