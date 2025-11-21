@@ -14,13 +14,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.18.3",
   "dependencies": {
-    "canvas": "^3.2.0",
+    "@google/genai": "^1.30.0",
+    "@napi-rs/canvas": "^0.1.82",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "formdata-node": "^6.0.3",
+    "form-data": "^4.0.5",
     "multer": "^2.0.2",
-    "pdfjs-dist": "^5.4.394"
+    "pdf-lib": "^1.17.1",
+    "unpdf": "^1.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
