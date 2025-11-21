@@ -7,19 +7,58 @@
     <style>
       body {
         font-family: system-ui, Arial, sans-serif;
-        margin: 2rem;
+        margin: 0;
+        padding: 2rem;
+        min-height: 100vh;
+        background: #f9fafb;
+      }
+      .container {
         max-width: 720px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
       }
       h1 {
         font-size: 1.4rem;
         margin-bottom: 1rem;
+        text-align: center;
       }
       form {
-        display: flex;
+        display: grid;
         gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
         margin-bottom: 1.5rem;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .form-group label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #374151;
+      }
+      .form-group input[type="text"],
+      .form-group input[type="file"] {
+        padding: 0.6rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: border-color 200ms, box-shadow 200ms;
+      }
+      .form-group input[type="text"]:focus,
+      .form-group input[type="file"]:focus {
+        outline: none;
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+      .form-group input[type="text"]:hover {
+        border-color: #9ca3af;
+      }
+      .form-group input[type="text"]::placeholder {
+        color: #9ca3af;
       }
       #statusText {
         margin: 0.75rem 0 0.25rem;
@@ -54,15 +93,25 @@
         margin-top: 1rem;
         font-size: 0.9rem;
         color: #444;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        padding: 0 2rem;
+        box-sizing: border-box;
       }
       button {
         background: #4f46e5;
         color: #fff;
         border: none;
-        padding: 0.55rem 1rem;
+        padding: 0.65rem 1.25rem;
         border-radius: 6px;
         cursor: pointer;
         font-size: 0.9rem;
+        font-weight: 500;
+        transition: background 200ms;
+        margin-top: 0.5rem;
+      }
+      button:hover:not(:disabled) {
+        background: #4338ca;
       }
       button:disabled {
         opacity: 0.5;
@@ -75,6 +124,7 @@
         margin-top: 1rem;
         font-size: 0.85rem;
         background: #ffffff;
+        table-layout: fixed;
       }
       .result-table thead th {
         background: #4f46e5;
@@ -88,6 +138,9 @@
         padding: 0.45rem 0.6rem;
         border-top: 1px solid #e5e7eb;
         vertical-align: top;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        max-width: 150px;
       }
       .result-table tbody tr:nth-child(even) {
         background: #f8f9ff;
@@ -104,19 +157,71 @@
       .result-table td:first-child {
         font-weight: 500;
         white-space: nowrap;
+        max-width: 80px;
+      }
+      .result-table th:nth-child(1),
+      .result-table td:nth-child(1) {
+        width: 10%;
+      }
+      .result-table th:nth-child(2),
+      .result-table td:nth-child(2) {
+        width: 20%;
+      }
+      .result-table th:nth-child(3),
+      .result-table td:nth-child(3) {
+        width: 25%;
+      }
+      .result-table th:nth-child(4),
+      .result-table td:nth-child(4) {
+        width: 30%;
+      }
+      .result-table th:nth-child(5),
+      .result-table td:nth-child(5) {
+        width: 15%;
       }
     </style>
   </head>
   <body>
-    <h1>Upload PDF for Analysis</h1>
-    <form id="upload-form" enctype="multipart/form-data">
-      <input
-        type="file"
-        name="file"
-        id="fileInput"
-        accept="application/pdf"
-        required
-      />
+    <div class="container">
+      <h1>Upload PDF for Analysis</h1>
+      <form id="upload-form" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="fileInput">PDF File</label>
+        <input
+          type="file"
+          name="file"
+          id="fileInput"
+          accept="application/pdf"
+          required
+        />
+      </div>
+      <div class="form-group">
+        <label for="rule1">Rule 1</label>
+        <input
+          type="text"
+          name="rule1"
+          id="rule1"
+          placeholder="Enter first rule to check"
+        />
+      </div>
+      <div class="form-group">
+        <label for="rule2">Rule 2</label>
+        <input
+          type="text"
+          name="rule2"
+          id="rule2"
+          placeholder="Enter second rule to check"
+        />
+      </div>
+      <div class="form-group">
+        <label for="rule3">Rule 3</label>
+        <input
+          type="text"
+          name="rule3"
+          id="rule3"
+          placeholder="Enter third rule to check"
+        />
+      </div>
       <button type="submit" id="submitBtn">Start Analysis</button>
     </form>
     <p id="statusText">Idle.</p>
@@ -132,7 +237,8 @@
         aria-valuemin="0"
         aria-valuemax="100"
         aria-valuenow="0"
-      ></div>
+      </div>
+    </div>
     </div>
     <div id="result"></div>
 

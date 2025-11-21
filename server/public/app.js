@@ -63,10 +63,21 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  // Get rule values
+  const rule1 = document.getElementById("rule1").value.trim();
+  const rule2 = document.getElementById("rule2").value.trim();
+  const rule3 = document.getElementById("rule3").value.trim();
+
+  // Validate at least one rule is provided
+  if (!rule1 && !rule2 && !rule3) {
+    alert("Please provide at least one rule to check.");
+    return;
+  }
+
   submitBtn.disabled = true;
   statusText.textContent = "Uploading...";
 
-  const data = new FormData();
+  const data = new FormData(form);
   data.append("file", fileInput.files[0]);
 
   try {
