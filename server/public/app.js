@@ -64,9 +64,9 @@ form.addEventListener("submit", async (e) => {
   }
 
   // Get rule values
-  const rule1 = document.getElementById("rule1").value.trim();
-  const rule2 = document.getElementById("rule2").value.trim();
-  const rule3 = document.getElementById("rule3").value.trim();
+  const rule1 = document.getElementById("rule1").value.trim()?.toLowerCase();
+  const rule2 = document.getElementById("rule2").value.trim()?.toLowerCase();
+  const rule3 = document.getElementById("rule3").value.trim()?.toLowerCase();
 
   // Validate at least one rule is provided
   if (!rule1 && !rule2 && !rule3) {
@@ -77,8 +77,9 @@ form.addEventListener("submit", async (e) => {
   submitBtn.disabled = true;
   statusText.textContent = "Uploading...";
 
-  const data = new FormData(form);
+  const data = new FormData();
   data.append("file", fileInput.files[0]);
+  data.append("rules", JSON.stringify([rule1, rule2, rule3]));
 
   try {
     const resp = await fetch("/api/pdf-analyze", {
@@ -86,12 +87,14 @@ form.addEventListener("submit", async (e) => {
       body: data,
     });
 
+    const json = await resp.json();
+
     if (!resp.ok) {
-      const err = await resp.json().catch(() => ({}));
-      throw new Error(err?.message || "Upload failed");
+      console.log(json);
+
+      throw new Error(json?.message || "Upload failed");
     }
 
-    const json = await resp.json();
     const { analysisId, fileName } = json?.data || {};
     resultDiv.textContent = `Started analysis for: ${fileName}`;
     setProgress(0, "Starting analysis...");
@@ -111,10 +114,17 @@ form.addEventListener("submit", async (e) => {
       try {
         const data = JSON.parse(event.data);
         const { progress, status } = data;
+
         setProgress(progress, status);
         if (progress >= 100) {
           const { data: resultData } = data;
-          showResult(resultData);
+
+          if (!resultData.error) {
+            showResult(resultData);
+          } else {
+            console.error("Analysis error:", resultData.error);
+          }
+
           currentSource.close();
           submitBtn.disabled = false;
         }
