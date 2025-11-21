@@ -7,19 +7,22 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     cb(null, Date.now() + "-" + file.originalname);
   },
-  fileFilter: function (req, file, cb) {
-    if (file.mimetype !== "application/pdf") {
-      cb(new Error("Only PDF files are allowed!"), false);
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      cb(new Error("File size exceeds limit of 5MB!"), false);
-    }
-
-    cb(null, true);
-  },
 });
 
-const upload = multer({ storage: storage });
+const fileFilter = function (req, file, cb) {
+  if (file.mimetype !== "application/pdf") {
+    cb(new Error("Only PDF files are allowed!"), false);
+  } else {
+    cb(null, true);
+  }
+};
+
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+});
 
 export default upload;
