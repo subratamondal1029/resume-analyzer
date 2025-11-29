@@ -14,72 +14,85 @@ function setProgress(pct, status) {
 }
 
 function showResult(result) {
-  const rows = Array.isArray(result) ? result : [result];
-
   // Clear previous results
   resultDiv.innerHTML = "";
 
-  // Create table
-  const table = document.createElement("table");
-  table.className = "result-table";
+  // Create card for single result object
+  const card = document.createElement("div");
+  card.className = "result-card";
 
-  const thead = document.createElement("thead");
-  thead.innerHTML =
-    "<tr><th>Status</th><th>Rule</th><th>Evidence</th><th>Reasoning</th><th>Confidence</th></tr>";
-  table.appendChild(thead);
+  const statusBadge = document.createElement("div");
+  statusBadge.className = `result-status ${result.status}`;
+  statusBadge.textContent = result.status?.toUpperCase() || "UNKNOWN";
+  card.appendChild(statusBadge);
 
-  const tbody = document.createElement("tbody");
-  rows.forEach((r) => {
-    const tr = document.createElement("tr");
+  const evidenceField = document.createElement("div");
+  evidenceField.className = "result-field";
+  evidenceField.innerHTML = `<label>Evidence</label><p>${
+    result.evidence || "N/A"
+  }</p>`;
+  card.appendChild(evidenceField);
 
-    const tdStatus = document.createElement("td");
-    tdStatus.textContent = r.status ?? "";
+  const reasoningField = document.createElement("div");
+  reasoningField.className = "result-field";
+  reasoningField.innerHTML = `<label>Reasoning</label><p>${
+    result.reasoning || "N/A"
+  }</p>`;
+  card.appendChild(reasoningField);
 
-    const tdRule = document.createElement("td");
-    tdRule.textContent = r.rule ?? "";
+  const confidenceField = document.createElement("div");
+  confidenceField.className = "result-field";
+  const confidenceBar = document.createElement("div");
+  confidenceBar.className = "confidence-bar";
+  confidenceBar.innerHTML = `<label>Confidence Score:</label><span class="confidence-value">${
+    result.confidence != null ? result.confidence + "%" : "N/A"
+  }</span>`;
+  confidenceField.appendChild(confidenceBar);
+  card.appendChild(confidenceField);
 
-    const tdEvidence = document.createElement("td");
-    tdEvidence.textContent = r.evidence ?? "";
-
-    const tdReasoning = document.createElement("td");
-    tdReasoning.textContent = r.reasoning ?? "";
-
-    const tdConfidence = document.createElement("td");
-    tdConfidence.textContent = r.confidence != null ? `${r.confidence}%` : "";
-
-    tr.append(tdStatus, tdRule, tdEvidence, tdReasoning, tdConfidence);
-    tbody.appendChild(tr);
-  });
-
-  table.appendChild(tbody);
-  resultDiv.appendChild(table);
+  resultDiv.appendChild(card);
 }
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   if (!fileInput.files.length) {
-    alert("Please choose a PDF file first.");
+    alert("Please choose a resume PDF file first.");
     return;
   }
 
-  // Get rule values
-  const rule1 = document.getElementById("rule1").value.trim()?.toLowerCase();
-  const rule2 = document.getElementById("rule2").value.trim()?.toLowerCase();
-  const rule3 = document.getElementById("rule3").value.trim()?.toLowerCase();
+  // Get review criteria values
+  const role = document.getElementById("role").value.trim();
+  const skillsInput = document.getElementById("skills").value.trim();
+  const experience = document.getElementById("experience").value.trim();
+  const otherDetails = document.getElementById("otherDetails").value.trim();
 
-  // Validate at least one rule is provided
-  if (!rule1 && !rule2 && !rule3) {
-    alert("Please provide at least one rule to check.");
+  // Validate required fields
+  if (!role || !skillsInput || !experience) {
+    alert("Please fill in all required fields (Role, Skills, Experience).");
     return;
   }
+
+  // Convert skills string to array
+  const skills = skillsInput
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s);
 
   submitBtn.disabled = true;
-  statusText.textContent = "Uploading...";
+  statusText.textContent = "Uploading resume...";
 
   const data = new FormData();
   data.append("file", fileInput.files[0]);
-  data.append("rules", JSON.stringify([rule1, rule2, rule3]));
+  data.append(
+    "rules",
+    JSON.stringify({
+      role,
+      skills,
+      experience,
+      other_details: otherDetails || undefined,
+    })
+  );
 
   try {
     const resp = await fetch("/api/pdf-analyze", {
@@ -96,8 +109,8 @@ form.addEventListener("submit", async (e) => {
     }
 
     const { analysisId, fileName } = json?.data || {};
-    resultDiv.textContent = `Started analysis for: ${fileName}`;
-    setProgress(0, "Starting analysis...");
+    resultDiv.textContent = `Reviewing resume: ${fileName}`;
+    setProgress(0, "Starting resume review...");
 
     if (!analysisId) {
       throw new Error("No analysisId returned from server");

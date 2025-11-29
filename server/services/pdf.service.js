@@ -4,6 +4,7 @@ import { extractText, getDocumentProxy, renderPageAsImage } from "unpdf";
 import axios from "axios";
 import FormData from "form-data";
 import { GoogleGenAI, ApiError as GoogleApiError } from "@google/genai";
+import ApiError from "../utils/ApiError.js";
 
 class PDFService {
   constructor() {
@@ -15,6 +16,17 @@ class PDFService {
   async extractTextFromPdf(pdfPath) {
     const buffer = await fs.readFile(pdfPath);
     const pdf = await getDocumentProxy(new Uint8Array(buffer));
+    const pageCount = pdf.numPages;
+
+    if (pageCount === 0) {
+      throw new ApiError(400, "The PDF document contains no pages.");
+    } else if (pageCount > 5) {
+      throw new ApiError(
+        400,
+        "The PDF document exceeds the maximum page limit of 5 pages."
+      );
+    }
+
     const result = await extractText(pdf, { mergePages: true });
     return result.text;
   }
@@ -73,11 +85,11 @@ class PDFService {
     const response = await this.ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: `
-      Below is the extracted text from document pages:
-      ---DOC_START---
+      Below is the extracted text from the resume:
+      ---RESUME_START---
       ${text}
-      ---DOC_END---
-      RULE_TO_CHECK: ${rules}
+      ---RESUME_END---
+      REVIEW_CRITERIA: ${rules}
       `,
       config: {
         thinkingConfig: {
@@ -86,20 +98,26 @@ class PDFService {
         temperature: 0.1,
         maxOutputTokens: 512,
         topP: 0.8,
-        systemInstruction: `SYSTEM: You are a precise rule-checker. Output STRICT valid JSON only, no commentary.
-        USER: Below is the extracted text from document pages:
-        ---DOC_START---
-        [TEXT HERE]
-        ---DOC_END---
-        RULE_TO_CHECK: "[<the rule here>, <the rule2 here>, <the rule3 here>]"
+        systemInstruction: `SYSTEM: You are an expert resume reviewer. Output STRICT valid JSON only, no commentary.
+        USER: You will receive a resume and review criteria including:
+        - role: The target job role/position
+        - skills: Array of required skills (e.g., ["html", "javascript", "react"])
+        - experience: Experience level to validate (check if projects and work experience match the level, not just years. For freshers, evaluate project quality and relevance)
+        - other_details: Any additional requirements
+        
         INSTRUCTIONS:
-        1. Decide PASS or FAIL whether the document satisfies the rule.
-        2. Provide one short evidence sentence that includes page number.
-        3. Provide a 1–2 sentence reasoning.
-        4. Output an integer confidence 0–100 (higher = more sure).
-        5. Return ONLY this exact JSON object matching schema:
-          [{ "rule":"", "status":"pass|fail", "evidence":"", "reasoning":"", "confidence":0 }, ...]\n
-        Return exactly one JSON array with the number of objects depend on rules and nothing else.
+        1. Evaluate the resume comprehensively against ALL provided criteria.
+        2. For experience: Don't just count years. Assess if the candidate's projects, internships, or work history demonstrate competency matching the required level. Freshers with strong relevant projects can pass.
+        3. For skills: Check if the resume demonstrates the required technical skills through projects, work experience, or explicit mention.
+        4. Decide PASS or FAIL based on overall fit.
+        5. Provide specific evidence from the resume (mention sections, project names, or experiences).
+        6. Provide concise reasoning in 2-3 sentences explaining your decision, highlighting key strengths or gaps.
+        7. Output an integer confidence score 0-100 (higher = more confident in the assessment).
+        
+        Return ONLY this exact JSON object:
+        { "status": "pass|fail", "evidence": "specific evidence from resume", "reasoning": "2-3 sentence explanation of the decision", "confidence": 0 }
+        
+        Return exactly one JSON object and nothing else.
         `,
       },
     });
