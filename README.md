@@ -1,24 +1,26 @@
 # Resume Analyzer
 
-A powerful PDF document analysis system that extracts text from resumes/documents using JavaScript libraries for regular PDFs and OCR (Optical Character Recognition) for scanned images. The system then validates the content against user-defined rules using Google Gemini AI and returns structured results.
+An intelligent resume screening system that extracts text from PDF resumes using JavaScript libraries for regular PDFs and OCR (Optical Character Recognition) for scanned documents. The system evaluates resumes against job requirements using Google Gemini AI and provides comprehensive assessment with evidence, reasoning, and confidence scores.
 
 ## 🚀 Features
 
-- **Smart Text Extraction**: Automatically extracts text from PDF documents using `unpdf` library
-- **OCR Support**: Falls back to Tesseract OCR for scanned documents or PDFs with minimal extractable text
-- **AI-Powered Rule Checking**: Uses Google Gemini AI to validate documents against custom rules
+- **Smart Text Extraction**: Automatically extracts text from PDF resumes using `unpdf` library
+- **OCR Support**: Falls back to Tesseract OCR for scanned resumes or PDFs with minimal extractable text
+- **AI-Powered Resume Review**: Uses Google Gemini AI to evaluate resumes against job role, skills, and experience requirements
+- **Intelligent Experience Assessment**: Evaluates candidates based on project quality and relevance, not just years of experience
+- **Skills Matching**: Checks if resume demonstrates required technical skills through projects, work experience, or explicit mentions
 - **Real-time Progress Tracking**: Server-Sent Events (SSE) for live analysis progress updates
 - **Docker Support**: Self-hosted Tesseract OCR server running in Docker
-- **Web Interface**: Simple and intuitive UI for document upload and rule specification
-- **Structured Results**: Returns well-formatted JSON responses with evidence, reasoning, and confidence scores
+- **Web Interface**: Clean and intuitive UI for resume upload and job criteria specification
+- **Structured Assessment**: Returns well-formatted JSON with pass/fail status, evidence, reasoning, and confidence scores
 
 ## 🏗️ Architecture
 
 The system consists of three main components:
 
-1. **Express.js Backend** - Handles file uploads, orchestrates PDF processing, and manages API endpoints
-2. **Tesseract OCR Server** - Self-hosted Docker container for OCR processing of scanned documents
-3. **Google Gemini AI** - Cloud-based LLM for intelligent rule validation and analysis
+1. **Express.js Backend** - Handles resume uploads, orchestrates PDF processing, and manages API endpoints
+2. **Tesseract OCR Server** - Self-hosted Docker container for OCR processing of scanned resumes
+3. **Google Gemini AI** - Cloud-based LLM for intelligent resume evaluation and candidate assessment
 
 ```
 ┌─────────────┐      ┌──────────────────┐      ┌─────────────────┐
@@ -53,18 +55,21 @@ libjpeg-dev libgif-dev librsvg2-dev
 ### Option 1: Docker Compose (Recommended)
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/subratamondal1029/resume-analyzer.git
    cd resume-analyzer
    ```
 
 2. **Set up environment variables**
+
    ```bash
    cd server
    cp .env.example .env
    ```
-   
+
    Edit `.env` and add your Google Gemini API key:
+
    ```env
    PORT=3000
    TESSERACT_API=http://tesseract:8884/tesseract
@@ -74,6 +79,7 @@ libjpeg-dev libgif-dev librsvg2-dev
    ```
 
 3. **Start the services**
+
    ```bash
    cd ..
    docker-compose up -d
@@ -85,24 +91,28 @@ libjpeg-dev libgif-dev librsvg2-dev
 ### Option 2: Manual Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/subratamondal1029/resume-analyzer.git
    cd resume-analyzer/server
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install -g pnpm
    pnpm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 4. **Start Tesseract OCR server separately**
+
    ```bash
    docker run -d -p 8884:8884 hertzg/tesseract-server:latest
    ```
@@ -117,27 +127,33 @@ libjpeg-dev libgif-dev librsvg2-dev
 ### Web Interface
 
 1. Navigate to `http://localhost:3000`
-2. Upload a PDF file (max 5MB)
-3. Enter up to 3 rules to check against the document
-4. Click "Analyze" and watch real-time progress
-5. View structured results with evidence and confidence scores
+2. Upload a resume PDF file (max 5MB, up to 5 pages)
+3. Enter job requirements:
+   - **Job Role**: Target position (e.g., Frontend Developer, Full Stack Engineer)
+   - **Skills**: Required technical skills as comma-separated values (e.g., html, javascript, react)
+   - **Experience Level**: Required experience (e.g., Fresher, 2-3 years, Mid-level, Senior)
+   - **Other Details**: Additional requirements (optional)
+4. Click "Review Resume" and watch real-time progress
+5. View comprehensive assessment with PASS/FAIL status, evidence, reasoning, and confidence score
 
 ### API Endpoints
 
-#### 1. Analyze PDF Document
+#### 1. Review Resume
 
 **POST** `/api/pdf-analyze`
 
-Upload a PDF file and specify rules for analysis.
+Upload a resume PDF and specify job requirements for evaluation.
 
 **Request:**
+
 ```bash
 curl -X POST http://localhost:3000/api/pdf-analyze \
   -F "file=@resume.pdf" \
-  -F 'rules=["Must contain contact information", "Should mention at least 2 years of experience", "Must include education details"]'
+  -F 'rules={"role":"Frontend Developer","skills":["html","javascript","react"],"experience":"2-3 years","other_details":"Bachelor degree in CS"}'
 ```
 
 **Response:**
+
 ```json
 {
   "statusCode": 200,
@@ -157,11 +173,13 @@ curl -X POST http://localhost:3000/api/pdf-analyze \
 Stream real-time progress updates for an ongoing analysis.
 
 **Request:**
+
 ```bash
 curl -N http://localhost:3000/api/pdf-analyze/status/1234567890
 ```
 
 **Response Stream:**
+
 ```
 data: {"status":"Starting analysis...","progress":0}
 
@@ -179,60 +197,74 @@ data: {"status":"Analyzing Completed!","progress":100,"data":[...]}
 Check if the server is running.
 
 **Response:**
+
 ```json
 {
   "status": "OK"
 }
 ```
 
-## 📊 Rule Checking Format
+## 📊 Resume Review Format
 
-### Input Rules
+### Input Criteria
 
-Rules should be provided as an array of strings:
+Job requirements should be provided as a JSON object:
 
 ```json
-[
-  "Document must mention a date",
-  "Must contain contact information",
-  "Should list at least 3 technical skills"
-]
+{
+  "role": "Full Stack Developer",
+  "skills": ["javascript", "react", "node.js", "mongodb"],
+  "experience": "2-3 years or strong projects for freshers",
+  "other_details": "Bachelor's degree in Computer Science, remote work experience preferred"
+}
 ```
 
 ### Output Schema
 
-Each rule is analyzed and returns a structured result:
+The system returns a comprehensive assessment:
 
 ```json
 {
-  "rule": "Document must mention a date",
   "status": "pass",
-  "evidence": "Found on page 1: 'Published 2024-07-01'",
-  "reasoning": "Document explicitly contains a date string",
-  "confidence": 95
+  "evidence": "Candidate has 2 years of experience with React and Node.js at XYZ Company. Built 3 full-stack projects including an e-commerce platform with React frontend and Node.js backend.",
+  "reasoning": "The resume demonstrates strong alignment with the Full Stack Developer role. All required skills (JavaScript, React, Node.js, MongoDB) are evident through professional experience and project work. The candidate's 2 years of experience matches the requirement, and their projects show practical application of the technology stack.",
+  "confidence": 88
 }
 ```
 
 **Field Descriptions:**
-- `rule`: The original rule being checked
-- `status`: Either "pass" or "fail"
-- `evidence`: Specific text found in the document with page reference
-- `reasoning`: 1-2 sentence explanation of the decision
-- `confidence`: Integer from 0-100 indicating certainty level
+
+- `status`: Either "pass" or "fail" based on overall fit
+- `evidence`: Specific sections, projects, or experiences from the resume that support the assessment
+- `reasoning`: 2-3 sentence comprehensive explanation highlighting key strengths or gaps
+- `confidence`: Integer from 0-100 indicating certainty level of the assessment
+
+### Assessment Criteria
+
+The AI evaluates resumes based on:
+
+- **Role Alignment**: How well the candidate's background matches the target position
+- **Skills Verification**: Checks for required technical skills through projects, work experience, or explicit mentions
+- **Experience Quality**: Assesses if projects and work history demonstrate competency matching the required level
+  - For freshers: Evaluates project quality, complexity, and relevance
+  - For experienced: Validates professional experience and technical depth
+- **Additional Requirements**: Considers education, certifications, and other specified criteria
 
 ## 🐳 Docker Configuration
 
 The project uses Docker Compose with two services:
 
 ### Tesseract OCR Service
+
 - **Image**: `hertzg/tesseract-server:latest`
 - **Port**: 8884
 - **Purpose**: OCR text extraction from scanned documents
 
 ### Backend Service
+
 - **Base Image**: Node.js 20
 - **Port**: 3000
-- **Features**: 
+- **Features**:
   - Hot reload with nodemon
   - Volume mounting for development
   - Health checks
@@ -291,53 +323,63 @@ resume-analyzer/
 
 ### Environment Variables
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `PORT` | Server port | `3000` | No |
-| `TESSERACT_API` | Tesseract OCR endpoint | `http://localhost:8884/tesseract` | Yes |
-| `GEMINI_API_KEY` | Google Gemini API key | - | Yes |
-| `TEXT_THRESHOLD` | Min text length before OCR | `100` | No |
-| `OCR_TIMEOUT_MS` | OCR request timeout | `120000` | No |
+| Variable         | Description                | Default                           | Required |
+| ---------------- | -------------------------- | --------------------------------- | -------- |
+| `PORT`           | Server port                | `3000`                            | No       |
+| `TESSERACT_API`  | Tesseract OCR endpoint     | `http://localhost:8884/tesseract` | Yes      |
+| `GEMINI_API_KEY` | Google Gemini API key      | -                                 | Yes      |
+| `TEXT_THRESHOLD` | Min text length before OCR | `100`                             | No       |
+| `OCR_TIMEOUT_MS` | OCR request timeout        | `120000`                          | No       |
 
 ### File Upload Limits
 
 - **Max file size**: 5MB
+- **Max pages**: 5 pages (standard resume length)
 - **Allowed format**: PDF only
 - **Temporary storage**: Files are automatically deleted after analysis
 
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Express.js 5.1.0** - Web framework
 - **Node.js 20** - Runtime environment
 - **multer 2.0.2** - File upload handling
 
 ### PDF Processing
+
 - **unpdf 1.4.0** - PDF text extraction
 - **pdf-lib 1.17.1** - PDF manipulation
 - **@napi-rs/canvas 0.1.82** - Image rendering for OCR
 
 ### AI & OCR
+
 - **@google/genai 1.30.0** - Google Gemini AI integration
 - **Tesseract OCR** - Text recognition for scanned documents
 
 ### Additional Libraries
+
 - **axios 1.13.2** - HTTP client
 - **cors 2.8.5** - Cross-origin resource sharing
 - **dotenv 17.2.3** - Environment configuration
 
 ## 🔍 How It Works
 
-1. **File Upload**: User uploads a PDF file through the web interface or API
-2. **Text Extraction**: System attempts to extract text using `unpdf` library
-3. **OCR Fallback**: If extracted text is below threshold (default 100 chars), the system:
+1. **Resume Upload**: User uploads a resume PDF file through the web interface or API
+2. **Page Validation**: System checks if resume is within 5-page limit
+3. **Text Extraction**: System attempts to extract text using `unpdf` library
+4. **OCR Fallback**: If extracted text is below threshold (default 100 chars), the system:
    - Splits PDF into individual pages
    - Renders each page as an image
    - Sends images to Tesseract OCR server
    - Combines OCR results
-4. **Rule Validation**: Extracted text is sent to Google Gemini AI with user rules
-5. **Result Formatting**: AI response is parsed and formatted as structured JSON
-6. **Progress Updates**: Client receives real-time updates via Server-Sent Events
+5. **Resume Evaluation**: Extracted text is sent to Google Gemini AI with job criteria:
+   - Evaluates role fit
+   - Validates required skills through projects and experience
+   - Assesses experience quality (projects for freshers, professional work for experienced)
+   - Checks additional requirements
+6. **Comprehensive Assessment**: AI provides PASS/FAIL decision with evidence, detailed reasoning, and confidence score
+7. **Progress Updates**: Client receives real-time updates via Server-Sent Events
 
 ## 🧪 Testing
 
@@ -345,35 +387,43 @@ resume-analyzer/
 # Run the server in development mode
 pnpm run dev
 
-# Test with a sample PDF
+# Test with a sample resume
 curl -X POST http://localhost:3000/api/pdf-analyze \
-  -F "file=@test.pdf" \
-  -F 'rules=["Must contain a date"]'
+  -F "file=@sample_resume.pdf" \
+  -F 'rules={"role":"Software Engineer","skills":["python","django"],"experience":"Fresher with projects"}'
 ```
 
 ## 🐛 Troubleshooting
 
 ### Issue: OCR not working
+
 **Solution**: Ensure Tesseract Docker container is running:
+
 ```bash
 docker ps | grep tesseract
 ```
 
 ### Issue: Gemini API errors
+
 **Solution**: Verify your API key is correctly set in `.env`:
+
 ```bash
 cat server/.env | grep GEMINI_API_KEY
 ```
 
 ### Issue: File upload fails
+
 **Solution**: Check that `uploads/` directory exists and has write permissions:
+
 ```bash
 mkdir -p server/uploads
 chmod 755 server/uploads
 ```
 
 ### Issue: Docker build fails
+
 **Solution**: Ensure you have enough disk space and try rebuilding:
+
 ```bash
 docker-compose down
 docker-compose build --no-cache
@@ -391,13 +441,36 @@ pnpm run dev
 
 This starts the server with nodemon for automatic restarts on file changes.
 
-### Adding New Rules
+### Adding New Criteria
 
-Rules are flexible natural language statements. Examples:
-- "Document must be in English"
-- "Should contain at least 5 bullet points"
-- "Must mention Python or JavaScript"
-- "Should include a LinkedIn profile URL"
+Job criteria are flexible and support various formats:
+
+**Role Examples:**
+
+- "Frontend Developer"
+- "Full Stack Engineer"
+- "DevOps Engineer"
+- "Data Scientist"
+
+**Skills Examples:**
+
+- ["html", "css", "javascript"]
+- ["python", "django", "postgresql"]
+- ["react", "typescript", "node.js", "mongodb"]
+
+**Experience Examples:**
+
+- "Fresher" - Evaluates based on project quality
+- "1-2 years" - Checks internships and junior roles
+- "Mid-level" - Validates solid professional experience
+- "Senior" - Requires leadership and depth
+
+**Other Details Examples:**
+
+- "Bachelor's degree in Computer Science"
+- "Experience with cloud platforms (AWS/Azure)"
+- "Open source contributions preferred"
+- "Remote work experience"
 
 ## 🤝 Contributing
 
@@ -423,4 +496,4 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Note**: This is a resume analyzer application that can be extended to analyze any type of PDF document against custom rules. The system is designed to be flexible and can be adapted for various document validation use cases.
+**Note**: This resume analyzer uses AI-powered evaluation to screen candidates based on role fit, skills, and experience quality. The system goes beyond keyword matching by understanding project relevance and competency levels, making it suitable for evaluating both fresh graduates and experienced professionals.
