@@ -63,7 +63,7 @@ const initAsyncAnalysis = async (filePath, rules, analysisId) => {
   }
 };
 
-const pdfAnalyze = asyncHandler(async (req, res) => {
+const resumeReview = asyncHandler(async (req, res) => {
   let filePath;
   try {
     const file = req.file;
@@ -79,12 +79,12 @@ const pdfAnalyze = asyncHandler(async (req, res) => {
 
     const analysisId = Date.now().toString();
     createProgress(analysisId);
-    console.log(`Analyzing PDF file: ${file.originalname}`);
+    console.log(`Analyzing resume file: ${file.originalname}`);
 
     initAsyncAnalysis(file.path, rules, analysisId);
 
     res.json(
-      new ApiResponse(200, "PDF analysis started", {
+      new ApiResponse(200, "Resume review started", {
         fileName: file.originalname,
         analysisId,
       })
@@ -95,7 +95,7 @@ const pdfAnalyze = asyncHandler(async (req, res) => {
   }
 });
 
-const pdfAnalyzeStatus = asyncHandler(async (req, res) => {
+const resumeReviewStatus = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const progress = progresses[id];
@@ -132,4 +132,4 @@ const pdfAnalyzeStatus = asyncHandler(async (req, res) => {
   });
 });
 
-export { pdfAnalyze, pdfAnalyzeStatus };
+export { resumeReview, resumeReviewStatus };

@@ -95,7 +95,7 @@ form.addEventListener("submit", async (e) => {
   );
 
   try {
-    const resp = await fetch("/api/pdf-analyze", {
+    const resp = await fetch("/api/resume-review", {
       method: "POST",
       body: data,
     });
@@ -121,7 +121,7 @@ form.addEventListener("submit", async (e) => {
       currentSource.close();
     }
 
-    currentSource = new EventSource(`/api/pdf-analyze/status/${analysisId}`);
+    currentSource = new EventSource(`/api/resume-review/status/${analysisId}`);
 
     currentSource.onmessage = (event) => {
       try {

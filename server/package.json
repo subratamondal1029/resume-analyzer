@@ -1,5 +1,5 @@
 {
-  "name": "pdf_explainer_server",
+  "name": "resume_reviewer_server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import pdfAnalyzeRouter from "./routers/pdfAnalyze.route.js";
+import resumeReviewRouter from "./routers/resumeReview.route.js";
 
 const app = express();
 
@@ -14,6 +14,6 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-app.use("/api/pdf-analyze", pdfAnalyzeRouter);
+app.use("/api/resume-review", resumeReviewRouter);
 
 export default app;

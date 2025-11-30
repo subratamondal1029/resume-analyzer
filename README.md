@@ -300,11 +300,11 @@ resume-analyzer/
     ├── app.js                  # Express app configuration
     ├── config.js               # Environment configuration loader
     ├── controllers/
-    │   └── pdfAnalyze.controller.js  # Main analysis logic
+    │   └── resumeReview.controller.js  # Main analysis logic
     ├── services/
     │   └── pdf.service.js      # PDF processing & AI services
     ├── routers/
-    │   └── pdfAnalyze.route.js # API route definitions
+    │   └── resumeReview.route.js # API route definitions
     ├── middlewares/
     │   └── upload.middleware.js # File upload handling
     ├── utils/

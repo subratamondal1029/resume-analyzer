@@ -11,7 +11,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: pdf_backend
+    container_name: resume_reviewer_backend
     ports:
       - "3000:3000"
     env_file:
