@@ -1,0 +1,43 @@
+services:
+  tesseract:
+    image: hertzg/tesseract-server:latest
+    container_name: tesseract-server-prod
+    restart: unless-stopped
+    expose:
+      - "8884"
+    networks:
+      - resume_reviewer_network
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: resume_reviewer_backend_prod
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    environment:
+      - NODE_ENV=production
+      - TESSERACT_API=http://tesseract:8884/tesseract
+    depends_on:
+      - tesseract
+    networks:
+      - resume_reviewer_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      retries: 3
+      start_period: 40s
+      timeout: 10s
+    command: pnpm start
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  resume_reviewer_network:
+    driver: bridge
