@@ -2,6 +2,10 @@
 
 An intelligent resume screening system that extracts text from PDF resumes using JavaScript libraries for regular PDFs and OCR (Optical Character Recognition) for scanned documents. The system evaluates resumes against job requirements using Google Gemini AI and provides comprehensive assessment with evidence, reasoning, and confidence scores.
 
+# Preview working
+
+![Resume Analyzer Screenshot](./Resume_Reviewer_Screenshot.png)
+
 ## 🚀 Features
 
 - **Smart Text Extraction**: Automatically extracts text from PDF resumes using `unpdf` library
